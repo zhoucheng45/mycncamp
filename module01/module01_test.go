@@ -42,15 +42,24 @@ func Test01(t *testing.T) {
 */
 func Test02(t *testing.T) {
 	intChan := make(chan int, 10)
+
 	go func() {
-		for true {
-			intChan <- rand.Intn(10)
-			time.Sleep(time.Second)
+		ticker := time.NewTicker(time.Second)
+		for range ticker.C {
+			intn := rand.Intn(10)
+			println("准备放数据", intn)
+			intChan <- intn
 		}
 	}()
-
-	for i := 0; ; i++ {
-		val := <-intChan
-		println("从channel中获取到值:", val)
+	ticker := time.NewTicker(time.Second)
+	for range ticker.C {
+		select {
+		case val := <-intChan:
+			println("从channel中获取到值:", val)
+		default:
+			now := time.Now()
+			fmt.Printf("%v,没有数据\n", now)
+		}
 	}
+
 }
