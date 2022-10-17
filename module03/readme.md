@@ -86,7 +86,7 @@ c5458d73bcd3: Pushed
 994393dc58e7: Mounted from library/alpine 
 http-servicev0.0.1: digest: sha256:71fe201946875dff526516bfb85cd40c05cdc36402eb73415b70ae04320e29df size: 946
 ```
-
+镜像地址： https://hub.docker.com/repository/docker/zhoucheng45/test
 # 查看容器网络
 mac上不知道怎么安装nsenter工具。借用debian容器以特权启动，共享主机的namespace。
 ```shell
