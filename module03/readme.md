@@ -88,6 +88,16 @@ http-servicev0.0.1: digest: sha256:71fe201946875dff526516bfb85cd40c05cdc36402eb7
 ```
 镜像地址： https://hub.docker.com/repository/docker/zhoucheng45/test
 # 查看容器网络
+查看容器进程在宿主机中对应的PID
+```shell
+benny•~» docker ps                                                  
+CONTAINER ID   IMAGE                COMMAND            CREATED       STATUS       PORTS      NAMES
+94faaf30248b   http-server:v0.0.1   "./myhttpserver"   5 hours ago   Up 5 hours   8080/tcp   laughing_bell
+benny•~» PID=`docker inspect --format "{{.State.Pid}}" 94faaf30248b`                                                                   
+benny•~» echo $PID                                                                                                                       
+6884
+```
+
 mac上不知道怎么安装nsenter工具。借用debian容器以特权启动，共享主机的namespace。
 ```shell
 benny•~» docker run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh                                               [10:59:06]
