@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
@@ -16,6 +15,8 @@ import (
 3. Server 端记录访问日志包括客户端 IP，HTTP 返回码，输出到 server 端的标准输出
 4. 当访问 localhost/healthz 时，应返回 200
 */
+var logger = log.Default()
+
 func main() {
 	port := os.Getenv("port")
 	if port == "" {
@@ -36,7 +37,7 @@ func main() {
 
 func getLogInfo() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		fmt.Println("中间件开始执行了")
+		logger.Print("中间件开始执行了")
 		respHeader := context.Writer.Header()
 		// 请求头写入响应头
 		for key, val := range context.Request.Header {
@@ -55,6 +56,6 @@ func getLogInfo() gin.HandlerFunc {
 		context.Next()
 		status := context.Writer.Status()
 
-		fmt.Printf("请求客户端ip:%v, http状态码:%v\n", ip, status)
+		logger.Printf("请求客户端ip:%v, http状态码:%v\n", ip, status)
 	}
 }
