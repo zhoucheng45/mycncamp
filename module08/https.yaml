@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: http-servicev
+spec:
+  containers:
+    volumes:
+      - name: log
+        hostPath: "/data/log/"
+    - name: http-servicev
+      image: http-server:v0.0.1
+      volmeMounts:
+        - mountPath: /tmp/
+          name: log
+      resources:
+        limits:
+          memory: 1Gi
+          cpu: 1
+        requests:
+          memory: 256Mi
+            cpu: 1
+      env:
+        - name: port
+          valueFrom:
+            configMapKeyRef:
+              name: ng-configmap
+              key: httpPort
+      lifecycle:
+        preStop:
+          exec:
+            command: ["kill"  , "ps aux |grep  http-server   | grep -v grep | awk -F' ' '{print $2}' "]
+      readinessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+        initialDelaySeconds: 300
+        periodSeconds: 5
+        timeoutSeconds: 1
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ng-configmap
+data:
+  httpPort: "8080"
+  logdir: /tmp/
+
+
+
+

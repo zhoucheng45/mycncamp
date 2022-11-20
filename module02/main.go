@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 /*
@@ -32,6 +35,7 @@ func main() {
 	engine.GET("sayHello", func(context *gin.Context) {
 		context.JSON(200, map[string]string{"say": "hello"})
 	})
+	DealOsSignal()
 	engine.Run(":" + port)
 }
 
@@ -58,4 +62,35 @@ func getLogInfo() gin.HandlerFunc {
 
 		logger.Printf("请求客户端ip:%v, http状态码:%v\n", ip, status)
 	}
+}
+
+func DealOsSignal() {
+	//创建监听退出chan
+	c := make(chan os.Signal)
+	//监听指定信号 ctrl+c kill
+	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGSTOP,
+		syscall.SIGQUIT, syscall.SIGUSR1, syscall.SIGUSR2)
+	go func() {
+		for s := range c {
+			switch s {
+			case syscall.SIGHUP, syscall.SIGKILL, syscall.SIGSTOP,
+				syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
+				fmt.Println("Program Exit...", s)
+				GracefullExit()
+			case syscall.SIGUSR1:
+				fmt.Println("usr1 signal", s)
+			case syscall.SIGUSR2:
+				fmt.Println("usr2 signal", s)
+			default:
+				fmt.Println("other signal", s)
+			}
+		}
+	}()
+}
+
+func GracefullExit() {
+	fmt.Println("Start Exit...")
+	fmt.Println("Execute Clean...")
+	fmt.Println("End Exit...")
+	os.Exit(0)
 }
